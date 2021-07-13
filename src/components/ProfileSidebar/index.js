@@ -1,10 +1,27 @@
 import Box from '../Box';
+import { AlurakutProfileSidebarMenuDefault } from '../../lib/AlurakutCommons';
 
 export default function ProfileSidebar(props) {
-  console.log(props);
+  const { githubUser } = props;
+
   return (
-    <Box>
-      <img src={`https://github.com/${props.githubUser}.png`} style={{ borderRadius: '8px' }} />
+    <Box as="aside">
+      <img
+        src={`https://github.com/${githubUser}.png`}
+        style={{ borderRadius: '8px' }}
+        alt="githubUser"
+      />
+      <hr />
+
+      <p>
+        <a className="boxLink" href={`https://github.com/${githubUser}`}>
+          @
+          {githubUser}
+        </a>
+      </p>
+      <hr />
+
+      <AlurakutProfileSidebarMenuDefault />
     </Box>
-  )
+  );
 }

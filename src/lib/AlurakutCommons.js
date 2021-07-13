@@ -5,7 +5,6 @@ import NextLink from 'next/link';
 const BASE_URL = 'http://alurakut.vercel.app/';
 const v = '1';
 
-
 function Link({ href, children, ...props }) {
   return (
     <NextLink href={href} passHref>
@@ -13,7 +12,7 @@ function Link({ href, children, ...props }) {
         {children}
       </a>
     </NextLink>
-  )
+  );
 }
 
 // ================================================================================================================
@@ -27,7 +26,7 @@ export function AlurakutMenu({ githubUser }) {
         <AlurakutMenu.Logo src={`${BASE_URL}/logo.svg`} />
 
         <nav style={{ flex: 1 }}>
-          {[{ name: 'Inicio', slug: '/'}, {name: 'Amigos', slug: '/amigos'}, {name: 'Comunidades', slug: '/comunidades'}].map((menuItem) => (
+          {[{ name: 'Inicio', slug: '/' }, { name: 'Amigos', slug: '/amigos' }, { name: 'Comunidades', slug: '/comunidades' }].map((menuItem) => (
             <Link key={`key__${menuItem.name.toLocaleLowerCase()}`} href={`${menuItem.slug.toLocaleLowerCase()}`}>
               {menuItem.name}
             </Link>
@@ -35,7 +34,7 @@ export function AlurakutMenu({ githubUser }) {
         </nav>
 
         <nav>
-          <a href={`/logout`}>
+          <a href="/logout">
             Sair
           </a>
           <div>
@@ -50,7 +49,7 @@ export function AlurakutMenu({ githubUser }) {
       </div>
       <AlurakutMenuProfileSidebar githubUser={githubUser} />
     </AlurakutMenu.Wrapper>
-  )
+  );
 }
 AlurakutMenu.Wrapper = styled.header`
   width: 100%;
@@ -66,9 +65,9 @@ AlurakutMenu.Wrapper = styled.header`
     right: 0;
     top: 48px;
     transition: .3s;
-    pointer-events: ${({ isMenuOpen }) => isMenuOpen ? 'all' : 'none'};
-    opacity: ${({ isMenuOpen }) => isMenuOpen ? '1' : '0'};
-    transform: ${({ isMenuOpen }) => isMenuOpen ? 'translateY(0)' : 'translateY(calc(-100% - 48px))'};
+    pointer-events: ${({ isMenuOpen }) => (isMenuOpen ? 'all' : 'none')};
+    opacity: ${({ isMenuOpen }) => (isMenuOpen ? '1' : '0')};
+    transform: ${({ isMenuOpen }) => (isMenuOpen ? 'translateY(0)' : 'translateY(calc(-100% - 48px))')};
     @media(min-width: 860px) {
       display: none;
     }
@@ -175,7 +174,8 @@ function AlurakutMenuProfileSidebar({ githubUser }) {
         <hr />
         <p>
           <a className="boxLink" href={`/user/${githubUser}`}>
-            @{githubUser}
+            @
+            {githubUser}
           </a>
         </p>
         <hr />
@@ -183,7 +183,7 @@ function AlurakutMenuProfileSidebar({ githubUser }) {
         <AlurakutProfileSidebarMenuDefault />
       </div>
     </div>
-  )
+  );
 }
 
 // ================================================================================================================
@@ -222,7 +222,7 @@ export function AlurakutProfileSidebarMenuDefault() {
         </a>
       </nav>
     </AlurakutProfileSidebarMenuDefault.Wrapper>
-  )
+  );
 }
 AlurakutProfileSidebarMenuDefault.Wrapper = styled.div`
   a {
@@ -278,14 +278,14 @@ export function OrkutNostalgicIconSet(props) {
             <span className="OrkutNostalgicIconSet__iconComplex" className="OrkutNostalgicIconSet__number" style={{ gridArea: 'number' }}>
               {[0, 1, 2].map((_, index) => {
                 const isHeartActive = index <= (total - 1);
-                return <img key={`orkut__icon_set__${slug}_img_${index}`} src={`https://alurakut.vercel.app/icons/${icon}.svg`} style={{ marginRight: '2px', opacity: isHeartActive ? 1 : '0.5' }} />
+                return <img key={`orkut__icon_set__${slug}_img_${index}`} src={`https://alurakut.vercel.app/icons/${icon}.svg`} style={{ marginRight: '2px', opacity: isHeartActive ? 1 : '0.5' }} />;
               })}
             </span>
           </li>
         );
       })}
     </OrkutNostalgicIconSet.List>
-  )
+  );
 }
 OrkutNostalgicIconSet.List = styled.ul`
   margin-top: 32px;
