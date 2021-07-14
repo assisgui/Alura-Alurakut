@@ -1,48 +1,76 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { SiteClient } from 'datocms-client';
 import MainGrid from '../src/components/MainGrid';
 import Box from '../src/components/Box';
 import ProfileSidebar from '../src/components/ProfileSidebar';
 import { AlurakutMenu, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
-import ProfileRelationsBoxWrapper from '../src/components/ProfileRelations';
+import ProfileRelationsBox from '../src/components/ProfileRelationsBox';
 
 export default function Home() {
-  const usuarioAleatorio = 'assisgui';
-  const pessoasFavoritas = [
-    'BarbiieCode',
-    'WilliamYizima',
-    'giopecora',
-    'luizsandoval',
-    'lukasfialho',
-    'EmersonCDias',
-  ];
+  const user = 'assisgui';
 
-  const [communities, setCommunities] = useState([{
-    id: '12802378123789378912789789123896123',
-    title: 'Eu odeio acordar cedo',
-    image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg',
-  }]);
+  const client = new SiteClient('d95ba8e72b05de9eaf63dfe428f0f8');
 
-  const handleCreatingCommunity = (e) => {
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [communities, setCommunities] = useState([]);
+
+  const handleCreatingCommunity = async (e) => {
     e.preventDefault();
 
     const dataForm = new FormData(e.target);
 
-    const newCommunity = {
-      id: new Date().toISOString(),
+    await client.items.create({
+      itemType: '968040',
       title: dataForm.get('title'),
-      image: dataForm.get('image'),
-    };
+      imageUrl: dataForm.get('image'),
+    });
 
-    setCommunities([...communities, newCommunity]);
+    setCommunities([]);
   };
+
+  useEffect(async () => {
+    const result = await (await fetch(`http://api.github.com/users/${user}/followers`)).json();
+    setFollowers(result.splice(0, 6).map((value) => ({
+      id: value.id + value.login + new Date().toISOString(),
+      title: value.login,
+      image: value.avatar_url,
+      url: value.html_url,
+    })));
+  }, []);
+
+  useEffect(async () => {
+    const result = await (await fetch(`http://api.github.com/users/${user}/following`)).json();
+    setFollowing(result.splice(0, 6).map((value) => ({
+      id: value.id + value.login + new Date().toISOString(),
+      title: value.login,
+      image: value.avatar_url,
+      url: value.html_url,
+    })));
+  }, []);
+
+  useEffect(async () => {
+    const result = await client.items.all({
+      filter: {
+        type: 'community',
+      },
+    });
+
+    setCommunities(result.splice(0, 6).map((value) => ({
+      id: value.id + new Date().toISOString(),
+      title: value.title,
+      image: value.imageUrl,
+      url: `/users/${value.title}`,
+    })));
+  }, [communities]);
 
   return (
     <>
-      <AlurakutMenu githubUser={usuarioAleatorio} />
+      <AlurakutMenu githubUser={user} />
 
       <MainGrid>
         <div className="profileArea" style={{ gridArea: 'profileArea' }}>
-          <ProfileSidebar githubUser={usuarioAleatorio} />
+          <ProfileSidebar githubUser={user} />
         </div>
 
         <div className="welcomeArea" style={{ gridArea: 'welcomeArea' }}>
@@ -72,43 +100,11 @@ export default function Home() {
         </div>
 
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
-          <ProfileRelationsBoxWrapper>
-            <h2 className="smallTitle">
-              Comunidades (
-              {communities.length}
-              )
-            </h2>
+          <ProfileRelationsBox title="Seguidores" items={followers} />
 
-            <ul>
-              {communities.map((itemAtual) => (
-                <li key={itemAtual.id}>
-                  <a href={`/users/${itemAtual.title}`}>
-                    <img src={itemAtual.image} alt={itemAtual.image} />
-                    <span>{itemAtual.title}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </ProfileRelationsBoxWrapper>
+          <ProfileRelationsBox title="Seguindo" items={following} />
 
-          <ProfileRelationsBoxWrapper>
-            <h2 className="smallTitle">
-              Pessoas Favoritas (
-              {pessoasFavoritas.length}
-              )
-            </h2>
-
-            <ul>
-              {pessoasFavoritas.map((itemAtual) => (
-                <li key={itemAtual}>
-                  <a href={`/users/${itemAtual}`}>
-                    <img src={`https://github.com/${itemAtual}.png`} alt={`${itemAtual}`} />
-                    <span>{itemAtual}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </ProfileRelationsBoxWrapper>
+          <ProfileRelationsBox title="Comunidades" items={communities} />
         </div>
       </MainGrid>
     </>

@@ -1,9 +1,7 @@
 import Box from '../Box';
 import { AlurakutProfileSidebarMenuDefault } from '../../lib/AlurakutCommons';
 
-export default function ProfileSidebar(props) {
-  const { githubUser } = props;
-
+export default function ProfileSidebar({ githubUser }) {
   return (
     <Box as="aside">
       <img
