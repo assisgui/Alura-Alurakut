@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { SiteClient } from 'datocms-client';
 import MainGrid from '../src/components/MainGrid';
 import Box from '../src/components/Box';
 import ProfileSidebar from '../src/components/ProfileSidebar';
@@ -8,8 +7,6 @@ import ProfileRelationsBox from '../src/components/ProfileRelationsBox';
 
 export default function Home() {
   const user = 'assisgui';
-
-  const client = new SiteClient('d95ba8e72b05de9eaf63dfe428f0f8');
 
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
@@ -20,13 +17,19 @@ export default function Home() {
 
     const dataForm = new FormData(e.target);
 
-    await client.items.create({
-      itemType: '968040',
-      title: dataForm.get('title'),
-      imageUrl: dataForm.get('image'),
-    });
+    const result = await (await fetch('/api/createCommunities', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: dataForm.get('title'),
+        imageUrl: dataForm.get('image'),
+        creatorSlug: user,
+      }),
+    })).json();
 
-    setCommunities([]);
+    setCommunities([...communities, result]);
   };
 
   useEffect(async () => {
@@ -50,19 +53,12 @@ export default function Home() {
   }, []);
 
   useEffect(async () => {
-    const result = await client.items.all({
-      filter: {
-        type: 'community',
-      },
-    });
+    const result = await (await fetch('/api/getAllCommunities', {
+      method: 'GET',
+    })).json();
 
-    setCommunities(result.splice(0, 6).map((value) => ({
-      id: value.id + new Date().toISOString(),
-      title: value.title,
-      image: value.imageUrl,
-      url: `/users/${value.title}`,
-    })));
-  }, [communities]);
+    setCommunities(result);
+  }, []);
 
   return (
     <>
