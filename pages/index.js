@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
+import nookies from 'nookies';
+import { decode } from 'jsonwebtoken';
 import MainGrid from '../src/components/MainGrid';
 import Box from '../src/components/Box';
 import ProfileSidebar from '../src/components/ProfileSidebar';
 import { AlurakutMenu, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
 import ProfileRelationsBox from '../src/components/ProfileRelationsBox';
 
-export default function Home() {
-  const user = 'assisgui';
-
+export default function Home({ githubUser }) {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [communities, setCommunities] = useState([]);
@@ -25,7 +25,7 @@ export default function Home() {
       body: JSON.stringify({
         title: dataForm.get('title'),
         imageUrl: dataForm.get('image'),
-        creatorSlug: user,
+        creatorSlug: githubUser,
       }),
     })).json();
 
@@ -33,7 +33,7 @@ export default function Home() {
   };
 
   useEffect(async () => {
-    const result = await (await fetch(`http://api.github.com/users/${user}/followers`)).json();
+    const result = await (await fetch(`http://api.github.com/users/${githubUser}/followers`)).json();
     setFollowers(result.splice(0, 6).map((value) => ({
       id: value.id + value.login + new Date().toISOString(),
       title: value.login,
@@ -43,7 +43,7 @@ export default function Home() {
   }, []);
 
   useEffect(async () => {
-    const result = await (await fetch(`http://api.github.com/users/${user}/following`)).json();
+    const result = await (await fetch(`http://api.github.com/users/${githubUser}/following`)).json();
     setFollowing(result.splice(0, 6).map((value) => ({
       id: value.id + value.login + new Date().toISOString(),
       title: value.login,
@@ -62,11 +62,11 @@ export default function Home() {
 
   return (
     <>
-      <AlurakutMenu githubUser={user} />
+      <AlurakutMenu githubUser={githubUser} />
 
       <MainGrid>
         <div className="profileArea" style={{ gridArea: 'profileArea' }}>
-          <ProfileSidebar githubUser={user} />
+          <ProfileSidebar githubUser={githubUser} />
         </div>
 
         <div className="welcomeArea" style={{ gridArea: 'welcomeArea' }}>
@@ -105,4 +105,29 @@ export default function Home() {
       </MainGrid>
     </>
   );
+}
+
+export async function getServerSideProps(context) {
+  const token = nookies.get(context).USER_TOKEN;
+
+  const { isAuthenticated } = (await (await fetch('https://alurakut.vercel.app/api/auth', {
+    headers: {
+      Authorization: token,
+    },
+  })).json());
+  if (!isAuthenticated) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+
+  const { githubUser } = decode(token);
+  return {
+    props: {
+      githubUser,
+    },
+  };
 }
