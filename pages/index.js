@@ -33,7 +33,7 @@ export default function Home({ githubUser }) {
   };
 
   useEffect(async () => {
-    const result = await (await fetch(`http://api.github.com/users/${githubUser}/followers`)).json();
+    const result = await (await fetch(`https://api.github.com/users/${githubUser}/followers`)).json();
     setFollowers(result.splice(0, 6).map((value) => ({
       id: value.id + value.login + new Date().toISOString(),
       title: value.login,
@@ -43,7 +43,7 @@ export default function Home({ githubUser }) {
   }, []);
 
   useEffect(async () => {
-    const result = await (await fetch(`http://api.github.com/users/${githubUser}/following`)).json();
+    const result = await (await fetch(`https://api.github.com/users/${githubUser}/following`)).json();
     setFollowing(result.splice(0, 6).map((value) => ({
       id: value.id + value.login + new Date().toISOString(),
       title: value.login,
